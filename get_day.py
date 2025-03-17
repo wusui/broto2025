@@ -63,5 +63,4 @@ def find_range(dfrom, dto):
     list(map(fr_func, bundle))
 
 if __name__ == "__main__":
-    #yesterday()
     find_range('2025-02-27', '2025-03-10')

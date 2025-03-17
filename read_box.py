@@ -79,4 +79,4 @@ def get_game_info(game_no):
     return info[0][0] + info[0][1] + info[1][0] + info[1][1]
 
 if __name__ == "__main__":
-    save_data(get_game_info('401704401'), 'INFO1')
+    save_data(get_game_info('401704235'), 'INFO0')

@@ -6,13 +6,15 @@ TO DO: handle glossary data
 To DO: extract extras data in parentheses
 """
 import re
-from deeper_stats import grand_slams
+from deeper_stats import grand_slams, hbp_rem, def_extras, hndl_risp, hndl_dptp
 
 def extra_convert(peeps, raw_data):
     """
     Handle the 'extra' fields in raw_data
     """
     def proc_extra(lpeeps, extra_stats):
+        def get_tm_indx():
+            return list(raw_data['score']).index(lpeeps[0]['team'])
         def handle_stat(estat):
             def hs_inner(entry):
                 parts = entry.split()
@@ -28,12 +30,25 @@ def extra_convert(peeps, raw_data):
                         if len(prec) > 1:
                             print(pname + ' has duplicates')
                         if len(prec) == 1:
-                            prec[0][estat[0][0]] = count
+                            if estat[0][0] not in prec[0]:
+                                prec[0][estat[0][0]] = 0
+                            prec[0][estat[0][0]] += count
+            def hbp_loc(binc):
+                hbp_rem(binc, get_tm_indx(), peeps)
             brk = ','
             if ';' in estat[1]:
                 brk = ';'
             slist = list(map(lambda a: a.strip(), estat[1].split(brk)))
+            if estat[0][0] == 'HBP':
+                list(map(hbp_loc, estat[0][1].split(brk)))
+                return
             list(map(hs_inner, slist))
+            if estat[0][0] in ['2B', '3B', 'SB', 'CS', 'Picked Off']:
+                def_extras(estat, 1 - get_tm_indx(), peeps)
+            if estat[0][0] == 'Team RISP':
+                hndl_risp(estat, get_tm_indx(), peeps)
+            if estat[0][0] in ['DP', 'TP']:
+                hndl_dptp(estat, get_tm_indx(), peeps)
         clean_stats = list(map(lambda a: re.sub(r'\([^)]*\)', '', a[1]),
                         extra_stats))
         extra_stats = list(zip(extra_stats, clean_stats))
